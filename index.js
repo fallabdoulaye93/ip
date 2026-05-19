@@ -3,10 +3,10 @@ const axios = require('axios');
 
 const app = express();
 
-app.get('/', async (req, res) => {
-  const url =
-      'http://s1.pluton-pro.com/get.php?username=5159228492&password=0318872656&output=ts&type=m3u_plus';
+const url =
+    'http://s1.pluton-pro.com/get.php?username=5159228492&password=0318872656&output=ts&type=m3u_plus';
 
+app.get('/', async (req, res) => {
   try {
     console.log('Calling URL:', url);
 
@@ -15,6 +15,7 @@ app.get('/', async (req, res) => {
       responseType: 'text',
       maxRedirects: 0,
       validateStatus: () => true,
+      proxy: false,
       headers: {
         'User-Agent': 'Mozilla/5.0',
         Accept: '*/*',
@@ -29,7 +30,7 @@ app.get('/', async (req, res) => {
       location: response.headers.location || null,
       preview:
           typeof response.data === 'string'
-              ? response.data.substring(0, 500)
+              ? response.data.substring(0, 1000)
               : response.data,
     });
   } catch (e) {
@@ -41,6 +42,16 @@ app.get('/', async (req, res) => {
       code: e.code,
     });
   }
+});
+
+app.get('/env', (req, res) => {
+  res.json({
+    HTTP_PROXY: process.env.HTTP_PROXY || null,
+    HTTPS_PROXY: process.env.HTTPS_PROXY || null,
+    http_proxy: process.env.http_proxy || null,
+    https_proxy: process.env.https_proxy || null,
+    NO_PROXY: process.env.NO_PROXY || null,
+  });
 });
 
 app.listen(process.env.PORT || 3000, () => {
