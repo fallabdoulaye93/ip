@@ -5,42 +5,30 @@ const app = express();
 
 app.get('/', async (req, res) => {
   try {
+    const url = 'https://raw.githubusercontent.com/iptv-org/iptv/master/index.m3u';
 
-    const url =
-        'http://s1.pluton-pro.com/get.php?username=5159228492&password=0318872656&output=ts&type=m3u_plus';
-
-    console.log('Calling:', url);
+    console.log('Calling URL:', url);
 
     const response = await axios.get(url, {
       timeout: 20000,
       responseType: 'text',
-      headers: {
-        'User-Agent': 'Mozilla/5.0'
-      }
+      maxRedirects: 0,
     });
 
-    console.log('SUCCESS');
-
-    res.type('text/plain');
-    res.send(response.data);
-
+    res.type('text/plain').send(response.data);
   } catch (e) {
-
-    console.log('ERROR FULL:', e);
-
-    if (e.response) {
-      console.log('STATUS:', e.response.status);
-      console.log('DATA:', e.response.data);
-    }
-
-    if (e.code) {
-      console.log('CODE:', e.code);
-    }
-
-    res.status(500).send({
+    console.log('ERROR:', {
       message: e.message,
       code: e.code,
-      stack: e.stack
+      status: e.response?.status,
+      location: e.response?.headers?.location,
+    });
+
+    res.status(500).json({
+      message: e.message,
+      code: e.code,
+      status: e.response?.status,
+      redirectLocation: e.response?.headers?.location,
     });
   }
 });
