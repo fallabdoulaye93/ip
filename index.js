@@ -3,8 +3,23 @@ const axios = require('axios');
 
 const app = express();
 
+
 const url =
     'http://s1.pluton-pro.com/get.php?username=5159228492&password=0318872656&output=ts&type=m3u_plus';
+
+const dns = require('dns').promises;
+
+app.get('/dns', async (req, res) => {
+  try {
+    const result = await dns.lookup('s1.pluton-pro.com');
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({
+      message: e.message,
+      code: e.code
+    });
+  }
+});
 
 app.get('/', async (req, res) => {
   try {
